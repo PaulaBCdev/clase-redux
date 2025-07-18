@@ -1,0 +1,27 @@
+.new-tweet-page {
+  display: flex;
+  gap: 10px;
+  padding: 10px 15px 10px 15px;
+}
+
+.new-tweet-page-form {
+  flex: 1;
+}
+
+.new-tweet-page-textarea {
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgb(var(--color-border));
+}
+
+.new-tweet-page-footer {
+  align-items: center;
+  display: flex;
+}
+
+.new-tweet-page-characters {
+  color: rgb(var(--color-twitter));
+}
+
+.new-tweet-page-submit {
+  margin-left: auto;
+}

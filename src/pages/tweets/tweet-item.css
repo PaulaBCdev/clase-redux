@@ -1,0 +1,39 @@
+.tweet-item {
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+  padding: 10px 15px 10px 15px;
+  transition: background-color 0.2s;
+  border-style: solid;
+  border-color: rgb(var(--color-border));
+  border-bottom-width: 1px;
+}
+
+.tweet-item:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.tweet-item-header {
+  color: rgb(var(--color-secondary-text));
+  margin-bottom: 2px;
+}
+
+.tweet-item-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  max-width: 425px;
+}
+
+.tweet-item-name {
+  color: rgb(20, 23, 26);
+  font-weight: bold;
+}
+
+.tweet-item-username {
+  margin-left: 5px;
+}
+
+.tweet-item-separator {
+  padding: 0 5px;
+}
