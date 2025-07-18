@@ -5,7 +5,7 @@ type AuthLoginPending = {
 };
 
 type AuthLoginFulfilled = {
-  type: "auth/login/fullfiled";
+  type: "auth/login/fulfilled";
 };
 
 type AuthLoginRejected = {
@@ -32,7 +32,7 @@ export const AuthLoginPending = (): AuthLoginPending => ({
 });
 
 export const AuthLoginFulfilled = (): AuthLoginFulfilled => ({
-  type: "auth/login/fullfiled",
+  type: "auth/login/fulfilled",
 });
 
 export const AuthLoginRejected = (error: Error): AuthLoginRejected => ({

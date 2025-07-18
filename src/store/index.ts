@@ -20,10 +20,10 @@ export default function configureStore(
   return store;
 }
 
-export type AppStore = ReturnType<typeof configureStore>;
-export type AppGetState = AppStore["getState"];
-export type RootState = ReturnType<AppGetState>;
-export type AppDispatch = AppStore["dispatch"];
+export type AppStore = ReturnType<typeof configureStore>; // Tipo del store (lo que retorna configureStore)
+export type AppGetState = AppStore["getState"]; // Tipo de la funcion .getState() del store
+export type RootState = ReturnType<AppGetState>; // Tipo del estado completo del store
+export type AppDispatch = AppStore["dispatch"]; // Tipo de la funcion dispatch() del store
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();

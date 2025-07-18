@@ -1,3 +1,5 @@
+// Aqui van todas las funciones que voy a necesitar pasa sacar la informacion que necesite de Redux
+
 import type { RootState } from ".";
 
 export const getIsLogged = (state: RootState) => state.auth;
