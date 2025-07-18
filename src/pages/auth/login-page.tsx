@@ -1,11 +1,16 @@
 import "./login-page.css";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import Button from "../../components/ui/button";
-import { login } from "./service";
 import FormField from "../../components/ui/form-field";
 import { useLocation, useNavigate } from "react-router";
 import { AxiosError } from "axios";
-import { useLoginAction } from "../../store/hooks";
+import { useLoginAction, useUiResetError } from "../../store/hooks";
 import { useAppSelector } from "../../store";
 import { getUi } from "../../store/selectors";
 
@@ -13,14 +18,35 @@ function LoginPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const loginAction = useLoginAction();
+  const uiResetErrorAction = useUiResetError(); //cuando clicamos sobre el error (el onClick() esta abajo en el return) el campo error de ui cambia a null, por lo que el mensaje de error desaparece
+  const { pending: isFetching, error } = useAppSelector(getUi); //esta variable es la que permite la "subscripcion" a todo lo relacionado con la ui (errores y el pending) para que la interfaz pueda reaccionar cada vez que algo de ui cambie
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
-  const { pending: isFetching } = useAppSelector(getUi);
+  // const firstTime = useRef(true);
+  const timeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    timeoutRef.current = setTimeout(() => {
+      console.log("Timeout", timeoutRef.current);
+    }, 20000);
+    console.log("creating timeout", timeoutRef.current);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearInterval(timeoutRef.current);
+      }
+    };
+    // console.log("Effect");
+    // if (firstTime.current) {
+    //   console.log("First time");
+    //   firstTime.current = false;
+    // }
+  }, []);
 
   const { username, password } = credentials;
-  const isDisabled = !username || !password;
+  const isDisabled = !username || !password || isFetching;
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setCredentials((prevCredentials) => ({
@@ -33,17 +59,17 @@ function LoginPage() {
     event.preventDefault();
 
     try {
+      /* loginActionPending();
       await login(credentials);
-      loginAction();
+      loginActionFulfilled(); */
+      await loginAction(credentials); // esta sola linea hace todo lo que hay en las tres lineas superiores + loginActionRejected
 
       // Navigate to the page in state.from
       const to = location.state?.from ?? "/";
       navigate(to, { replace: true });
     } catch (error) {
       if (error instanceof AxiosError) {
-        setError({
-          message: error.response?.data?.message ?? error.message ?? "",
-        });
+        console.log(error);
       }
     }
   }
@@ -82,7 +108,7 @@ function LoginPage() {
           className="login-page-error"
           role="alert"
           onClick={() => {
-            setError(null);
+            uiResetErrorAction();
           }}
         >
           {error.message}

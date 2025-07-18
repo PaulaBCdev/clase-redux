@@ -1,7 +1,9 @@
-import { combineReducers, createStore } from "redux";
+import { combineReducers, createStore, applyMiddleware } from "redux";
 import * as reducers from "./reducer.ts";
-import { devToolsEnhancer } from "@redux-devtools/extension";
+import { composeWithDevTools } from "@redux-devtools/extension";
 import { useDispatch, useSelector } from "react-redux";
+import * as thunk from "redux-thunk";
+import type { Actions } from "./actions.ts";
 
 const rootReducer = combineReducers(reducers);
 
@@ -15,7 +17,9 @@ export default function configureStore(
     window.REDUX_DEVTOOLS_EXTENSION &&
       // @ts-expect-error: import devtools extension
       window.REDUX_DEVTOOLS_EXTENSION(), */
-    devToolsEnhancer(),
+    composeWithDevTools(
+      applyMiddleware(thunk.withExtraArgument<reducers.State, Actions>()),
+    ),
   );
   return store;
 }
@@ -27,3 +31,11 @@ export type AppDispatch = AppStore["dispatch"]; // Tipo de la funcion dispatch()
 
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
+
+// esto permite que los thunks puedan tener los tipos del store (para que entiendan la forma del estado global)
+export type AppThunk<ReturnType = void> = thunk.ThunkAction<
+  ReturnType,
+  RootState,
+  undefined,
+  Actions
+>;

@@ -67,12 +67,16 @@ export function ui(state = defaultState.ui, action: Actions): State["ui"] {
     return { pending: true, error: null };
   }
 
-  if (action.type === "auth/login/fullfiled") {
+  if (action.type === "auth/login/fulfilled") {
     return { pending: false, error: null };
   }
 
   if (action.type === "auth/login/rejected") {
     return { pending: false, error: action.payload };
+  }
+
+  if (action.type === "ui/reset-error") {
+    return { ...state, error: null };
   }
 
   return state;
