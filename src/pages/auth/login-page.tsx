@@ -5,14 +5,14 @@ import { login } from "./service";
 import FormField from "../../components/ui/form-field";
 import { useLocation, useNavigate } from "react-router";
 import { AxiosError } from "axios";
-import { useLogin } from "../../store/hooks";
+import { useLoginAction } from "../../store/hooks";
 import { useAppSelector } from "../../store";
 import { getUi } from "../../store/selectors";
 
 function LoginPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const loginAction = useLogin();
+  const loginAction = useLoginAction();
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",

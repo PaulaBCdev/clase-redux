@@ -3,17 +3,40 @@ import Button from "../../components/ui/button";
 import Photo from "../../components/ui/photo";
 import Textarea from "../../components/ui/textarea";
 import Page from "../../components/layout/page";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { createTweet } from "./service";
 import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
+import { useAppDispatch } from "../../store";
+import { tweetsCreated } from "../../store/actions";
 
 const MAX_CHARACTERS = 140;
 const MIN_CHARACTERS = 5;
 
-function NewTweetPage() {
+function NewTweetPageForm() {
+  const footerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [content, setContent] = useState("");
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    console.log(footerRef.current);
+    // footerRef.current?.click();
+    // buttonRef.current?.click();
+    console.log(textareaRef.current);
+    textareaRef.current?.focus();
+  }, []);
+
+  const progress = `${content.length} / ${MAX_CHARACTERS}`;
+  const isDisabled = content.length < MIN_CHARACTERS;
 
   function handleChange(event: ChangeEvent<HTMLTextAreaElement>) {
     setContent(event.target.value);
@@ -24,6 +47,7 @@ function NewTweetPage() {
 
     try {
       const createdTweet = await createTweet(content);
+      dispatch(tweetsCreated(createdTweet));
       navigate(`/tweets/${createdTweet.id}`);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -31,12 +55,48 @@ function NewTweetPage() {
           navigate("/login", { replace: true });
         }
       }
-      console.log(error);
     }
   }
 
-  const progress = `${content.length} / ${MAX_CHARACTERS}`;
-  const isDisabled = content.length < MIN_CHARACTERS;
+  return (
+    <form className="new-tweet-page-form" onSubmit={handleSubmit}>
+      <Textarea
+        className="new-tweet-page-textarea"
+        placeholder="Hey! What's up!"
+        maxLength={MAX_CHARACTERS}
+        // React 19: no need to use forwardRef to pass a ref to my component
+        ref={textareaRef}
+        value={content}
+        onChange={handleChange}
+      />
+      <div
+        ref={footerRef}
+        className="new-tweet-page-footer"
+        onClick={() => {
+          console.log("click");
+        }}
+      >
+        <span className="new-tweet-page-characters">{progress}</span>
+        <Button
+          type="submit"
+          className="new-tweet-page-submit"
+          $variant="primary"
+          ref={buttonRef}
+          disabled={isDisabled}
+        >
+          Let's go!
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function NewTweetPage() {
+  const someObject = {};
+
+  const someFunction = () => {
+    console.log("Click");
+  };
 
   return (
     <Page title="What are you thinking?">
@@ -44,26 +104,7 @@ function NewTweetPage() {
         <div>
           <Photo />
         </div>
-        <form className="new-tweet-page-form" onSubmit={handleSubmit}>
-          <Textarea
-            className="new-tweet-page-textarea"
-            placeholder="Hey! What's up!"
-            maxLength={MAX_CHARACTERS}
-            value={content}
-            onChange={handleChange}
-          />
-          <div className="new-tweet-page-footer">
-            <span className="new-tweet-page-characters">{progress}</span>
-            <Button
-              type="submit"
-              className="new-tweet-page-submit"
-              $variant="primary"
-              disabled={isDisabled}
-            >
-              Let's go!
-            </Button>
-          </div>
-        </form>
+        <NewTweetPageForm />
       </div>
     </Page>
   );

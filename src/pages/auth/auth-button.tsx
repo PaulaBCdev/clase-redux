@@ -1,11 +1,11 @@
 import { Link } from "react-router";
 import Button from "../../components/ui/button";
 import { logout } from "../../pages/auth/service";
-import { useAuth, useLogout } from "../../store/hooks.ts";
+import { useAuth, useLogoutAction } from "../../store/hooks.ts";
 
 export default function AuthButton() {
   const isLogged = useAuth();
-  const logoutAction = useLogout();
+  const logoutAction = useLogoutAction();
 
   const handleLogoutClick = async () => {
     await logout();

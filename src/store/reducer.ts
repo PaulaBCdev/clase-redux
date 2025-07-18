@@ -39,7 +39,7 @@ export function auth(
   action: Actions,
 ): State["auth"] {
   switch (action.type) {
-    case "auth/login/fullfiled":
+    case "auth/login/fulfilled":
       return true;
     case "auth/logout":
       return false;

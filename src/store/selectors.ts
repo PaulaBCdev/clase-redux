@@ -9,6 +9,7 @@ export const getTweets = (state: RootState) => state.tweets;
 /* export const getTweetDetail = (state: RootState, tweetId?: string) =>
   state.tweets.find((tweet) => tweet.id === Number(tweetId)); */
 export function getTweetDetail(tweetId?: string) {
+  //A partir de aqui seria el selector real, la linea de antes crea una funcion que llama al selector
   return function (state: RootState) {
     return state.tweets.find((tweet) => tweet.id === Number(tweetId));
   };

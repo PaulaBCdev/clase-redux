@@ -44,7 +44,7 @@ export const authLogout = (): AuthLogout => ({
   type: "auth/logout",
 });
 
-export const tweetsLoades = (tweets: Tweet[]): TweetsLoaded => ({
+export const tweetsLoaded = (tweets: Tweet[]): TweetsLoaded => ({
   type: "tweets/loaded",
   payload: tweets,
 });

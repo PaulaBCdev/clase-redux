@@ -6,7 +6,7 @@ import TweetItem from "./tweet-item";
 import Page from "../../components/layout/page";
 import { Link } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { tweetsLoades } from "../../store/actions";
+import { tweetsLoaded } from "../../store/actions";
 import { getTweets } from "../../store/selectors";
 
 const EmptyList = () => (
@@ -18,22 +18,13 @@ const EmptyList = () => (
 
 // TweetsPage va a ser un componente
 function TweetsPage() {
-  const dispatch = useAppDispatch();
-  const tweets = useAppSelector(getTweets);
+  const dispatch = useAppDispatch(); // Aqui se puede hacer un custom hook como hemos hecho con useLoginAction (en store - hooks.ts)
+  const tweets = useAppSelector(getTweets); //Aqui cogemos los tweets que mas abajo hemos mandado a Redux para poder imprimirlos por pantalla (los usamos en el return de abajo)
 
-  /* 
-  Opcion 1 de llamada a api
-  useEffect(() => {
-    getLatestTweets().then((tweets) => {
-      setTweets(tweets);
-    });
-  }, []); */
-
-  // Opcion 2 de llamada a api
   useEffect(() => {
     async function getTweets() {
       const tweets = await getLatestTweets();
-      dispatch(tweetsLoades(tweets));
+      dispatch(tweetsLoaded(tweets)); //Aqui cogemos los tweets que se han cargado de la API y se los mandamos al estado global para que Redux los guarde
     }
     getTweets();
   }, [dispatch]);
