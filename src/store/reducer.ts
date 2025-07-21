@@ -3,7 +3,7 @@ import type { Actions } from "./actions";
 
 export type State = {
   auth: boolean;
-  tweets: Tweet[];
+  tweets: Tweet[] | null;
   ui: {
     pending: boolean;
     error: Error | null;
@@ -12,7 +12,7 @@ export type State = {
 
 const defaultState: State = {
   auth: false,
-  tweets: [],
+  tweets: null,
   ui: {
     pending: false,
     error: null,
@@ -53,10 +53,11 @@ export function tweets(
   actions: Actions,
 ): State["tweets"] {
   switch (actions.type) {
-    case "tweets/loaded":
+    case "tweets/loaded/fulfilled":
       return actions.payload;
-    case "tweets/created":
-      return [...state, actions.payload];
+    case "tweets/created/fulfilled":
+      return [actions.payload, ...(state ?? [])];
+    // (state ?? []) quiere decir que si llegados a este punto state es null, me carga un array vacio
     default:
       return state;
   }

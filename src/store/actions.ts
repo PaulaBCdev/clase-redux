@@ -1,6 +1,11 @@
 import type { AppThunk } from ".";
 import { login } from "../pages/auth/service";
 import type { Credentials } from "../pages/auth/types";
+import {
+  createTweet,
+  getLatestTweets,
+  getTweet,
+} from "../pages/tweets/service";
 import type { Tweet } from "../pages/tweets/types";
 
 type AuthLoginPending = {
@@ -20,13 +25,13 @@ type AuthLogout = {
   type: "auth/logout";
 };
 
-type TweetsLoaded = {
-  type: "tweets/loaded";
+type TweetsLoadedFulfilled = {
+  type: "tweets/loaded/fulfilled";
   payload: Tweet[];
 };
 
-type TweetsCreated = {
-  type: "tweets/created";
+type TweetsCreatedFulfilled = {
+  type: "tweets/created/fulfilled";
   payload: Tweet;
 };
 
@@ -69,15 +74,55 @@ export const authLogout = (): AuthLogout => ({
   type: "auth/logout",
 });
 
-export const tweetsLoaded = (tweets: Tweet[]): TweetsLoaded => ({
-  type: "tweets/loaded",
+export const tweetsLoadedFulfilled = (
+  tweets: Tweet[],
+): TweetsLoadedFulfilled => ({
+  type: "tweets/loaded/fulfilled",
   payload: tweets,
 });
 
-export const tweetsCreated = (tweet: Tweet): TweetsCreated => ({
-  type: "tweets/created",
+export const tweetsCreatedFulfilled = (
+  tweet: Tweet,
+): TweetsCreatedFulfilled => ({
+  type: "tweets/created/fulfilled",
   payload: tweet,
 });
+
+export function tweetsLoaded(): AppThunk<Promise<void>> {
+  return async function (dispatch, getState) {
+    const state = getState();
+    if (state.tweets) {
+      return;
+    }
+    // El crear una variable state que es el estado actual que hay guardado en Redux sirve para que, en el caso de que ya haya un array (es decir, ya se ha llamado a la api y se han obtenido los tweets) no se vuelva a realizar otra llamada a la api
+
+    try {
+      // Igual que hicimos con la funcion authLogin(), aqui podemos tratar un tweetsLoadedPending (los tweets estan cargando)...
+      const tweets = await getLatestTweets();
+      dispatch(tweetsLoadedFulfilled(tweets)); //Aqui cogemos los tweets que se han cargado de la API y se los mandamos al estado global para que Redux los guarde
+    } catch (error) {
+      // ... y aqui un tweetsLoadedRejected (error al cargar os tweets)
+      console.log(error);
+    }
+  };
+}
+
+export function tweetsCreate(tweetContent: string): AppThunk<Promise<Tweet>> {
+  return async function (dispatch) {
+    try {
+      // Aqui se trataria el tweetsCreatedPending
+      // Aqui se trata el tweetsCreatedFulfilled
+      const createdTweet = await createTweet(tweetContent);
+      const tweet = await getTweet(createdTweet.id.toString()); // createdTweet no contiene toda la informacion que pide sparrest, por lo que daria un error. Creamos una variable tweet que ya si contiene toda la informacion de tweet que necesita sparrest. ATENCION: este paso no es necesario en la practica, nos vale solo con el createdTweet
+      dispatch(tweetsCreatedFulfilled(tweet));
+      return tweet;
+    } catch (error) {
+      // Aqui se trataria el tweetsCreatedRejected
+      console.log(error);
+      throw error;
+    }
+  };
+}
 
 export const uiResetError = (): UiResetError => ({
   type: "ui/reset-error",
@@ -88,6 +133,6 @@ export type Actions =
   | AuthLoginFulfilled
   | AuthLoginRejected
   | AuthLogout
-  | TweetsCreated
-  | TweetsLoaded
+  | TweetsCreatedFulfilled
+  | TweetsLoadedFulfilled
   | UiResetError;

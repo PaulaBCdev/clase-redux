@@ -1,5 +1,4 @@
 import "./tweets-page.css";
-import { getLatestTweets } from "./service";
 import { useEffect } from "react";
 import Button from "../../components/ui/button";
 import TweetItem from "./tweet-item";
@@ -22,12 +21,16 @@ function TweetsPage() {
   const tweets = useAppSelector(getTweets); //Aqui cogemos los tweets que mas abajo hemos mandado a Redux para poder imprimirlos por pantalla (los usamos en el return de abajo)
 
   useEffect(() => {
+    dispatch(tweetsLoaded());
+  }, [dispatch]);
+  /* ESTO ES LO QUE HACIA EL useEffect ANTES DE HACER UN MIDDLEWARE EN EL ARCHIVO ACTIONS.TS ENCARGADO DE OBTENER LOS TWEETS DE LA APO Y MANDARLOS AL ESTADO GLOBAL DE REDUX:
+  useEffect(() => {
     async function getTweets() {
       const tweets = await getLatestTweets();
-      dispatch(tweetsLoaded(tweets)); //Aqui cogemos los tweets que se han cargado de la API y se los mandamos al estado global para que Redux los guarde
+      dispatch(tweetsLoaded(tweets)); 
     }
     getTweets();
-  }, [dispatch]);
+  }, [dispatch]); */
 
   return (
     <Page title="What are you thinking?!">

@@ -14,7 +14,7 @@ import { createTweet } from "./service";
 import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
 import { useAppDispatch } from "../../store";
-import { tweetsCreated } from "../../store/actions";
+import { tweetsCreate } from "../../store/actions";
 
 const MAX_CHARACTERS = 140;
 const MIN_CHARACTERS = 5;
@@ -46,8 +46,7 @@ function NewTweetPageForm() {
     event.preventDefault();
 
     try {
-      const createdTweet = await createTweet(content);
-      dispatch(tweetsCreated(createdTweet));
+      const createdTweet = await dispatch(tweetsCreate(content));
       navigate(`/tweets/${createdTweet.id}`);
     } catch (error) {
       if (error instanceof AxiosError) {

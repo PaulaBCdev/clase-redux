@@ -10,7 +10,7 @@ export const getLatestTweets = async () => {
 };
 
 export const getTweet = async (tweetId: string) => {
-  const url = `${TWEETS_URL}/${tweetId}`;
+  const url = `${TWEETS_URL}/${tweetId}?_expand=user&_embed=likes`;
   const response = await client.get<Tweet>(url);
   return response.data;
 };
