@@ -4,11 +4,41 @@ import { composeWithDevTools } from "@redux-devtools/extension";
 import { useDispatch, useSelector } from "react-redux";
 import * as thunk from "redux-thunk";
 import type { Actions } from "./actions.ts";
+import * as tweets from "../pages/tweets/service.ts";
+import * as auth from "../pages/auth/service.ts";
+import type { createBrowserRouter } from "react-router";
 
 const rootReducer = combineReducers(reducers);
 
+type Router = ReturnType<typeof createBrowserRouter>;
+
+type ExtraArgument = {
+  api: { auth: typeof auth; tweets: typeof tweets };
+  router: Router;
+};
+
+// Ejemplo de middleware "hecho a mano" para redirigir en caso de error
+// @ts-expect-error: any
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const failureRedirects = (router: Router) => (store) => (next) => (action) => {
+  const result = next(action);
+
+  if (!action.type.endsWith("/rejected")) {
+    return result;
+  }
+
+  if (action.payload.status === 404) {
+    router.navigate("/404");
+  }
+
+  if (action.payload.status === 401) {
+    router.navigate("/login");
+  }
+};
+
 export default function configureStore(
   preloadedState: Partial<reducers.State>,
+  router: Router,
 ) {
   const store = createStore(
     rootReducer,
@@ -18,7 +48,14 @@ export default function configureStore(
       // @ts-expect-error: import devtools extension
       window.REDUX_DEVTOOLS_EXTENSION(), */
     composeWithDevTools(
-      applyMiddleware(thunk.withExtraArgument<reducers.State, Actions>()),
+      applyMiddleware(
+        thunk.withExtraArgument<reducers.State, Actions, ExtraArgument>({
+          api: { tweets, auth }, // El ExtraArgument lo vamos a utilizar para que las llamadas a la api (para traer los tweets la primera vez y para la autenticacion) se haga a traves de una accion con thunk, quitandole asi mas trabajo a los componentes.
+          // En este caso, como vemos en el type de ExtraArgument, al tener auth y tweets los tipos que hay en sus respectivos archivos de service.ts, podremos tener acceso directo a las funciones de login y logout del service.ts del auth, y a las funciones de getTweet, getLatestTweets y createTweet del service.ts de tweets
+          router, // Con el ExtraArgument tambien vamos a tener acceso a las rutas de react. Para ello, hemos modificado ligeramente el archivo main.tsx para crear nuestro propio BrowserRouter y poder usarlo donde lo necesitemos
+        }),
+        failureRedirects(router),
+      ),
     ),
   );
   return store;
@@ -36,6 +73,6 @@ export const useAppSelector = useSelector.withTypes<RootState>();
 export type AppThunk<ReturnType = void> = thunk.ThunkAction<
   ReturnType,
   RootState,
-  undefined,
+  ExtraArgument,
   Actions
 >;

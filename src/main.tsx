@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import storage from "./utils/storage.ts";
 import { setAuthorizationHeader } from "./api/client.ts";
-import { BrowserRouter } from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router";
 import ErrorBoundary from "./components/errors/error-boundary.tsx";
 import configureStore from "./store/index.ts";
 import { Provider } from "react-redux";
@@ -14,16 +14,17 @@ if (accessToken) {
   setAuthorizationHeader(accessToken);
 }
 
-const store = configureStore({ auth: !!accessToken });
+const router = createBrowserRouter([{ path: "*", element: <App /> }]);
+//                                 esto quiere decir: con cualquier ruta, renderizas el componente App
+
+const store = configureStore({ auth: !!localStorage }, router);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
-      <BrowserRouter>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </BrowserRouter>
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
     </ErrorBoundary>
   </StrictMode>,
 );

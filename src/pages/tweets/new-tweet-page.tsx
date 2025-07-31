@@ -10,7 +10,6 @@ import {
   type ChangeEvent,
   type FormEvent,
 } from "react";
-import { createTweet } from "./service";
 import { useNavigate } from "react-router";
 import { AxiosError } from "axios";
 import { useAppDispatch } from "../../store";
@@ -45,16 +44,16 @@ function NewTweetPageForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    try {
-      const createdTweet = await dispatch(tweetsCreate(content));
-      navigate(`/tweets/${createdTweet.id}`);
+    dispatch(tweetsCreate(content));
+    /* try {
+      await dispatch(tweetsCreate(content));
     } catch (error) {
       if (error instanceof AxiosError) {
         if (error.status === 401) {
           navigate("/login", { replace: true });
         }
       }
-    }
+    } */
   }
 
   return (

@@ -1,9 +1,12 @@
 import type { Tweet } from "../pages/tweets/types";
-import type { Actions } from "./actions";
+import type { Actions, ActionsRejected } from "./actions";
 
 export type State = {
   auth: boolean;
-  tweets: Tweet[] | null;
+  tweets: {
+    loaded: boolean;
+    data: Tweet[];
+  };
   ui: {
     pending: boolean;
     error: Error | null;
@@ -12,7 +15,10 @@ export type State = {
 
 const defaultState: State = {
   auth: false,
-  tweets: null,
+  tweets: {
+    loaded: false,
+    data: [],
+  },
   ui: {
     pending: false,
     error: null,
@@ -50,17 +56,23 @@ export function auth(
 
 export function tweets(
   state = defaultState.tweets,
-  actions: Actions,
+  action: Actions,
 ): State["tweets"] {
-  switch (actions.type) {
+  switch (action.type) {
     case "tweets/loaded/fulfilled":
-      return actions.payload;
+      return { loaded: true, data: action.payload };
+    case "tweets/detail/fulfilled":
+      return { loaded: false, data: [action.payload] };
     case "tweets/created/fulfilled":
-      return [actions.payload, ...(state ?? [])];
+      return { ...state, data: [action.payload, ...(state.data ?? [])] };
     // (state ?? []) quiere decir que si llegados a este punto state es null, me carga un array vacio
     default:
       return state;
   }
+}
+
+function isRejected(action: Actions): action is ActionsRejected {
+  return action.type.endsWith("/rejected");
 }
 
 export function ui(state = defaultState.ui, action: Actions): State["ui"] {
@@ -72,7 +84,7 @@ export function ui(state = defaultState.ui, action: Actions): State["ui"] {
     return { pending: false, error: null };
   }
 
-  if (action.type === "auth/login/rejected") {
+  if (isRejected(action)) {
     return { pending: false, error: action.payload };
   }
 

@@ -1,19 +1,13 @@
 import { Link } from "react-router";
 import Button from "../../components/ui/button";
-import { logout } from "../../pages/auth/service";
 import { useAuth, useLogoutAction } from "../../store/hooks.ts";
 
 export default function AuthButton() {
   const isLogged = useAuth();
   const logoutAction = useLogoutAction();
 
-  const handleLogoutClick = async () => {
-    await logout();
-    logoutAction();
-  };
-
   return isLogged ? (
-    <Button onClick={handleLogoutClick} $variant="secondary">
+    <Button onClick={logoutAction} $variant="secondary">
       Logout
     </Button>
   ) : (

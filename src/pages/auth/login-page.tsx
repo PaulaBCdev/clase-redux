@@ -8,15 +8,12 @@ import {
 } from "react";
 import Button from "../../components/ui/button";
 import FormField from "../../components/ui/form-field";
-import { useLocation, useNavigate } from "react-router";
 import { AxiosError } from "axios";
 import { useLoginAction, useUiResetError } from "../../store/hooks";
 import { useAppSelector } from "../../store";
 import { getUi } from "../../store/selectors";
 
 function LoginPage() {
-  const location = useLocation();
-  const navigate = useNavigate();
   const loginAction = useLoginAction();
   const uiResetErrorAction = useUiResetError(); //cuando clicamos sobre el error (el onClick() esta abajo en el return) el campo error de ui cambia a null, por lo que el mensaje de error desaparece
   const { pending: isFetching, error } = useAppSelector(getUi); //esta variable es la que permite la "subscripcion" a todo lo relacionado con la ui (errores y el pending) para que la interfaz pueda reaccionar cada vez que algo de ui cambie
@@ -58,20 +55,18 @@ function LoginPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    try {
-      /* loginActionPending();
+    await loginAction(credentials);
+    // Este await antes estaba metido dentro de un try-catch (el que tenemos justo abajo), pero en esta ocasion, como ejemplo de clase, el profesor ha hecho un middleware que se encarga de manejar los errores, por lo que en este punto del codigo solo necesitamos llamar a loginAction y ya el middleware se encarga de captar el error y enseñarlo en caso de que se dé
+    //try {
+    /* loginActionPending();
       await login(credentials);
       loginActionFulfilled(); */
-      await loginAction(credentials); // esta sola linea hace todo lo que hay en las tres lineas superiores + loginActionRejected
-
-      // Navigate to the page in state.from
-      const to = location.state?.from ?? "/";
-      navigate(to, { replace: true });
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        console.log(error);
-      }
-    }
+    //await loginAction(credentials); // esta sola linea hace todo lo que hay en las tres lineas superiores + loginActionRejected
+    //} catch (error) {
+    //if (error instanceof AxiosError) {
+    //console.log(error);
+    //}
+    //}
   }
 
   return (
