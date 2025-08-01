@@ -22,9 +22,9 @@ function LoginPage() {
     password: "",
   });
   // const firstTime = useRef(true);
-  const timeoutRef = useRef<number | null>(null);
+  //const timeoutRef = useRef<number | null>(null);
 
-  useEffect(() => {
+  /* useEffect(() => {
     timeoutRef.current = setTimeout(() => {
       console.log("Timeout", timeoutRef.current);
     }, 20000);
@@ -40,7 +40,7 @@ function LoginPage() {
     //   console.log("First time");
     //   firstTime.current = false;
     // }
-  }, []);
+  }, []); */
 
   const { username, password } = credentials;
   const isDisabled = !username || !password || isFetching;

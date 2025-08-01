@@ -64,8 +64,7 @@ export function tweets(
     case "tweets/detail/fulfilled":
       return { loaded: false, data: [action.payload] };
     case "tweets/created/fulfilled":
-      return { ...state, data: [action.payload, ...(state.data ?? [])] };
-    // (state ?? []) quiere decir que si llegados a este punto state es null, me carga un array vacio
+      return { ...state, data: [action.payload, ...state.data] };
     default:
       return state;
   }
